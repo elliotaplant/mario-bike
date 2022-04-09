@@ -1,15 +1,15 @@
 /* Pushbutton, Teensyduino Tutorial #3
-   http://www.pjrc.com/teensy/tutorial3.html
+http://www.pjrc.com/teensy/tutorial3.html
 
-   This example code is in the public domain.
+This example code is in the public domain.
 */
 
-void setup() {                
+void setup() {
   Serial.begin(38400);
   pinMode(0, INPUT);
 }
 
-void loop()                     
+void loop()
 {
   if (digitalRead(0) == HIGH) {
     Serial.println("Button is not pressed...");
