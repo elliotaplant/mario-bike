@@ -31,6 +31,8 @@ void setup()
 
   // Prepare the LED pin for output
   pinMode(ledPin, OUTPUT);
+
+  setupSpeed();
 }
 
 byte allButtons[numButtons];
@@ -47,8 +49,8 @@ void loop()
   
   Joystick.X(interpolatedValue);
 
-  int msPerCycle = getSpeed();
-  Serial.println(msPerCycle, DEC);
+  bool movin = moving();
+  Serial.println(movin ? "Moving" : "Not Moving");
   
    // read digital pins and use them for the buttons
   for (int i = 0; i < numButtons; i++) {
