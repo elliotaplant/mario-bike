@@ -4,8 +4,6 @@ https://github.com/elliotaplant/mario-bike
 Turn your bike into a Mario Kart controller
 */
 
-#include "InternalTemperature.h"
-
 const int numButtons = 12;
 const int ANALOG_PIN = 0;
 const int scaleFactor = 2;

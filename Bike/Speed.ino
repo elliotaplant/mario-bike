@@ -12,6 +12,7 @@ const int NUM_SAMPLES = 20;
 const int CHANGE_THRESHOLD = 5;
 const int ROTATION_DEBOUNCE_MS = 200;
 const int RPM_SMOOTHING_CYCLES = 3;
+const int SLOWDOWN_THRESHOLD_MS = 3000;
 
 int prevReadings[NUM_SAMPLES];
 int readingIndex = 0;
@@ -30,13 +31,16 @@ int getSpeed() {
   prevReadings[readingIndex] = hallValue;
   readingIndex = (readingIndex + 1) % NUM_SAMPLES;
 
+  // Find the difference in magnetic field to see if a rotation has happened
   int trailingAverageValue = trailingAverageSum / NUM_SAMPLES;
-
   int difference = abs(hallValue - trailingAverageValue);
 
+  // Get the time since the last rotation
+  time_t thisPass = millis();
+  time_t msSince = thisPass - lastPass;
+  
   if (difference > CHANGE_THRESHOLD) {
     Serial.println("MAGNETRON");
-    time_t thisPass = now();
     time_t msSince = thisPass - lastPass;
     
     if (msSince > ROTATION_DEBOUNCE_MS) {
@@ -45,7 +49,11 @@ int getSpeed() {
       prevRotationMs[smoothingIndex] = msSince;
       smoothingIndex = (smoothingIndex + 1) % RPM_SMOOTHING_CYCLES;
     }
-
-    return currentMsPerRotationSum / RPM_SMOOTHING_CYCLES;
+  } else if (msSince > SLOWDOWN_THRESHOLD_MS) {
+    currentMsPerRotationSum += (msSince - prevRotationMs[smoothingIndex]);
+    prevRotationMs[smoothingIndex] = msSince;
+    smoothingIndex = (smoothingIndex + 1) % RPM_SMOOTHING_CYCLES;
   }
+
+  return currentMsPerRotationSum / RPM_SMOOTHING_CYCLES;
 }
